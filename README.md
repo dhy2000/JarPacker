@@ -1,5 +1,7 @@
 # JarPacker
 
+An automatic tool to pack runnable jar from a source directory.
+
 Usage: 
 
     java -jar JarPacker.jar [sourcedir]
@@ -13,6 +15,10 @@ For instance, if there is a java project directory named `Project` , then you ca
     JarPacker.jar
 
 then run `java -jar JarPacker.jar Project` , and you will get a runnable jar file named `Project.jar` beside `JarPacker.jar` .
+
+## Feature
+
+This tool can find the only Main class **automatically** and build a java project into a runnable jar file.
 
 ## Warnings
 

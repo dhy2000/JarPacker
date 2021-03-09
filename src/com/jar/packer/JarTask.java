@@ -15,6 +15,7 @@ public class JarTask {
     private final File dir;
     private String mainClass;
     private File maniFest;
+    private final File outTempDir;
 
     private final Collection<File> sourceList = new ArrayList<>();
 
@@ -27,7 +28,7 @@ public class JarTask {
             System.out.println("Failed to find Main Class");
             System.exit(0);
         }
-        String metaInf = dir.getAbsolutePath() +
+        String metaInf = outTempDir.getAbsolutePath() +
             File.separator + "META-INF";
         File metaInfDir = new File(metaInf);
         if (!metaInfDir.exists()) {
@@ -55,7 +56,7 @@ public class JarTask {
     private void packJar() {
         System.out.println("Packing jar...");
         String jarName = dir.getName() + ".jar";
-        String command = "cmd /c cd " + ClassDetector.getPackageRoot() + " && " +
+        String command = "cmd /c cd " + outTempDir.getAbsolutePath() + " && " +
             "jar.exe cvfm " +
             jarName + " " + maniFest.getAbsolutePath() + " .";
         // System.out.println(command);
@@ -73,7 +74,7 @@ public class JarTask {
         try {
             Files.deleteIfExists(Paths.get(jarName));
             Files.move(Paths.get(
-                ClassDetector.getPackageRoot().getAbsolutePath() + File.separator + jarName)
+                outTempDir.getAbsolutePath() + File.separator + jarName)
                 , Paths.get("." + File.separator + jarName));
         } catch (IOException e) {
             System.out.println("Failed to move jar to current position.");
@@ -82,34 +83,37 @@ public class JarTask {
 
     public JarTask(String dir) {
         this.dir = new File(dir);
-        DirectoryVisit.visit(this.dir, file -> {
+        this.outTempDir = FileUtils.createTempDir();
+        if (Objects.isNull(outTempDir)) {
+            System.out.println("Failed to create output temporary directory");
+            System.exit(0);
+        }
+        FileUtils.forEach(this.dir, file -> {
             if (file.isFile()) {
                 if (file.getName().endsWith(".java")) {
                     System.out.println("Java source found: " + file.getAbsolutePath());
                     sourceList.add(file);
-                } else if (file.getName().endsWith(".class")) {
-                    System.out.println("Delete pre-compiled class: " + file.getAbsolutePath());
-                    boolean ign = file.delete();
                 }
             }
         });
-        Compiler.compile(sourceList);
-        DirectoryVisit.visit(this.dir, file -> {
+        Compiler.compile(sourceList, outTempDir);
+        FileUtils.forEach(this.outTempDir, file -> {
             if (file.isDirectory()) {
                 ClassDetector.addClassLoaderPath(file);
             }
         });
-        DirectoryVisit.visit(this.dir, file -> {
+        FileUtils.forEach(this.outTempDir, file -> {
             if (file.isFile()) {
-                if (file.getName().endsWith(".java")) {
+                if (file.getName().endsWith(".class")) {
                     if (Objects.isNull(mainClass)) {
-                        setMainClass(ClassDetector.getMainClass(file));
+                        setMainClass(ClassDetector.getMainClass(file, outTempDir));
                     }
                 }
             }
         });
         writeManifest();
         packJar();
+        FileUtils.rmdir(outTempDir);
     }
 
 }

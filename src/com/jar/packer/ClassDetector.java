@@ -83,7 +83,7 @@ public class ClassDetector {
         try {
             Method mainMethod = cls.getMethod("main", String[].class);
             return Modifier.isStatic(mainMethod.getModifiers()) ? classFullName : null;
-        } catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException | NoClassDefFoundError e) {
             return null;
         }
     }

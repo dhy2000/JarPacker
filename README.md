@@ -1,6 +1,6 @@
 # JarPacker
 
-An automatic tool to pack runnable jar from a source directory.
+An automatic tool to pack runnable jar from a Java source directory with **only one Main class**. 
 
 Usage: 
 
@@ -22,7 +22,8 @@ This tool can find the only Main class **automatically** and build a java projec
 
 ## Warnings
 
-The behavior is unpredictable if:
+The behavior will be unpredictable if:
 - There is no Main class or more than one with method `public static void main(String args[])` 
-- the `package` declarations in Java source code do not match the project directory tree.
+
+  
 

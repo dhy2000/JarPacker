@@ -20,7 +20,9 @@ public class JarTask {
     private final Collection<File> sourceList = new ArrayList<>();
 
     private void setMainClass(String mainClass) {
-        this.mainClass = mainClass;
+        if (Objects.nonNull(mainClass)) {
+            this.mainClass = mainClass;
+        }
     }
 
     private void writeManifest() {
@@ -99,7 +101,7 @@ public class JarTask {
         Compiler.compile(sourceList, outTempDir);
         FileUtils.forEach(this.outTempDir, file -> {
             if (file.isDirectory()) {
-                ClassDetector.addClassLoaderPath(file);
+                ClassDetector.addClassLoaderPath(file, outTempDir);
             }
         });
         FileUtils.forEach(this.outTempDir, file -> {

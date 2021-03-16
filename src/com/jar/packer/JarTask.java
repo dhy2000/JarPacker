@@ -99,11 +99,7 @@ public class JarTask {
             }
         });
         Compiler.compile(sourceList, outTempDir);
-        FileUtils.forEach(this.outTempDir, file -> {
-            if (file.isDirectory()) {
-                ClassDetector.addClassLoaderPath(file, outTempDir);
-            }
-        });
+        ClassDetector.addClassLoaderPath(outTempDir);
         FileUtils.forEach(this.outTempDir, file -> {
             if (file.isFile()) {
                 if (file.getName().endsWith(".class")) {

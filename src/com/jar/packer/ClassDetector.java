@@ -10,7 +10,7 @@ public class ClassDetector {
 
     private ClassDetector() {}
 
-    public static void addClassLoaderPath(File path, File rootPath) {
+    public static void addClassLoaderPath(File rootPath) {
         Method method;
         try {
             method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
@@ -28,7 +28,7 @@ public class ClassDetector {
             }
             method.setAccessible(access);
         } catch (NoSuchMethodException e) {
-            System.out.println("Failed to add Class Loader Path: " + path.getAbsolutePath());
+            System.out.println("Failed to add Class Loader Path: " + rootPath.getAbsolutePath());
             System.exit(0);
         }
 
